@@ -14,8 +14,8 @@ android {
         buildConfigField("String", "BUILDDATE", "new java.text.SimpleDateFormat(\"yyyy-MM-dd HH:mm\").format(new java.util.Date(" + System.currentTimeMillis() + "L));")
         buildConfigField("String", "ID", '"' + (System.getenv("API_KEY") ?: "") + '"')
         vectorDrawables.useSupportLibrary = true
-        applicationId "com.lagradost.shiro"
-        minSdkVersion 24
+        applicationId "app.nekomo"
+        minSdkVersion 21
         targetSdkVersion 34
         // Don't forget to update versionCode too :)
         versionCode 35
