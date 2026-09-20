@@ -5,7 +5,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import com.lagradost.shiro.BuildConfig
-import io.michaelrocks.paranoid.Obfuscate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -33,7 +32,6 @@ sealed class Resource<out T> {
 }
 
 fun logError(throwable: Throwable) {
-    @Obfuscate
     if (BuildConfig.BUILD_TYPE == "debug") {
         Log.d("ApiError", "-------------------------------------------------------------------")
         Log.d("ApiError", "safeApiCall: " + throwable.localizedMessage)

@@ -48,7 +48,9 @@ class CustomSenderFactory : ReportSenderFactory {
     }
 
     override fun enabled(config: CoreConfiguration): Boolean {
-        return true
+        // Disabled: the endpoint posts crash reports to the original Shiro
+        // developer's Google Form. Nekomo has no replacement sink yet.
+        return false
     }
 }
 
@@ -67,7 +69,7 @@ class AcraApplication : Application() {
                 //core configuration:
                 buildConfigClass = BuildConfig::class.java
                 reportFormat = StringFormat.JSON
-                reportContent = arrayOf(
+                reportContent = listOf(
                     ReportField.BUILD_CONFIG, ReportField.USER_CRASH_DATE,
                     ReportField.ANDROID_VERSION, ReportField.PHONE_MODEL,
                     ReportField.STACK_TRACE, ReportField.LOGCAT

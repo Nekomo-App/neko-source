@@ -20,8 +20,6 @@
             app:auto_show="true"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:fastforward_increment="10000"
-            app:rewind_increment="10000"
             app:controller_layout_id="@layout/player_custom_layout"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

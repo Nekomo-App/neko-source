@@ -1,4 +1,5 @@
 package com.lagradost.shiro.ui.tv
+import com.lagradost.shiro.utils.fv
 
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -25,7 +26,6 @@ import com.lagradost.shiro.utils.AppUtils.observe
 import com.lagradost.shiro.utils.ShiroApi
 import com.lagradost.shiro.utils.ShiroApi.Companion.initShiroApi
 import com.lagradost.shiro.utils.ShiroApi.Companion.requestHome
-import kotlinx.android.synthetic.main.fragment_main_tv.*
 import kotlin.concurrent.thread
 
 
@@ -33,16 +33,16 @@ class MainFragment : Fragment() {
 
     private fun homeLoaded(data: ShiroApi.ShiroHomePageNew?) {
         activity?.runOnUiThread {
-            main_load?.visibility = GONE
-            main_reload_data_btt?.visibility = GONE
-            vertical_grid_view.visibility = VISIBLE
+            fv<android.widget.ProgressBar>(R.id.main_load)?.visibility = GONE
+            fv<android.widget.Button>(R.id.main_reload_data_btt)?.visibility = GONE
+            fv<androidx.leanback.widget.VerticalGridView>(R.id.vertical_grid_view).visibility = VISIBLE
             val adapter: RecyclerView.Adapter<RecyclerView.ViewHolder> = MasterCardAdapter(
                 requireActivity(),
             )
-            vertical_grid_view?.adapter = adapter
-            (vertical_grid_view?.adapter as? MasterCardAdapter)?.notifyDataSetChanged()
+            fv<androidx.leanback.widget.VerticalGridView>(R.id.vertical_grid_view)?.adapter = adapter
+            (fv<androidx.leanback.widget.VerticalGridView>(R.id.vertical_grid_view)?.adapter as? MasterCardAdapter)?.notifyDataSetChanged()
             //val snapHelper = LinearSnapHelper()
-            //snapHelper.attachToRecyclerView(vertical_grid_view)
+            //snapHelper.attachToRecyclerView(fv<androidx.leanback.widget.VerticalGridView>(R.id.vertical_grid_view))
         }
     }
 
@@ -71,7 +71,7 @@ class MainFragment : Fragment() {
         val focusListener = View.OnFocusChangeListener { v, hasFocus ->
             val transition: Transition = AutoTransition()
             transition.duration = 2000 // DURATION OF ANIMATION IN MS
-            tv_menu_bar?.let {
+            fv<android.widget.RelativeLayout>(R.id.tv_menu_bar)?.let {
                 TransitionManager.beginDelayedTransition(it, transition)
             }
             val scale = if (hasFocus) 0.7f else 0.5f
@@ -79,23 +79,23 @@ class MainFragment : Fragment() {
             v?.scaleY = scale
         }
 
-        search_icon.onFocusChangeListener = focusListener
-        settings_icon.onFocusChangeListener = focusListener
-        library_icon.onFocusChangeListener = focusListener
+        fv<android.widget.ImageView>(R.id.search_icon).onFocusChangeListener = focusListener
+        fv<android.widget.ImageView>(R.id.settings_icon).onFocusChangeListener = focusListener
+        fv<android.widget.ImageView>(R.id.library_icon).onFocusChangeListener = focusListener
 
-        tv_menu_bar.visibility = VISIBLE
+        fv<android.widget.RelativeLayout>(R.id.tv_menu_bar).visibility = VISIBLE
 
-        search_icon.setOnClickListener {
+        fv<android.widget.ImageView>(R.id.search_icon).setOnClickListener {
             findNavController().navigate(
                 R.id.global_to_navigation_search_tv
             )
         }
-        library_icon.setOnClickListener {
+        fv<android.widget.ImageView>(R.id.library_icon).setOnClickListener {
             findNavController().navigate(
                 R.id.global_to_navigation_library_tv
             )
         }
-        settings_icon.setOnClickListener {
+        fv<android.widget.ImageView>(R.id.settings_icon).setOnClickListener {
             findNavController().navigate(
                 R.id.global_to_navigation_settings_tv
             )
@@ -109,12 +109,12 @@ class MainFragment : Fragment() {
         // Null check because somehow this can crash
         activity?.runOnUiThread {
             // ?. because it somehow crashes anyways without it for one person
-            if (main_reload_data_btt != null) {
-                main_reload_data_btt?.visibility = VISIBLE
-                main_load?.visibility = GONE
-                main_reload_data_btt?.setOnClickListener {
-                    main_reload_data_btt?.visibility = GONE
-                    main_load?.visibility = VISIBLE
+            if (fv<android.widget.Button>(R.id.main_reload_data_btt) != null) {
+                fv<android.widget.Button>(R.id.main_reload_data_btt)?.visibility = VISIBLE
+                fv<android.widget.ProgressBar>(R.id.main_load)?.visibility = GONE
+                fv<android.widget.Button>(R.id.main_reload_data_btt)?.setOnClickListener {
+                    fv<android.widget.Button>(R.id.main_reload_data_btt)?.visibility = GONE
+                    fv<android.widget.ProgressBar>(R.id.main_load)?.visibility = VISIBLE
                     thread {
                         if (fullRe) {
                             context?.initShiroApi()
@@ -129,10 +129,10 @@ class MainFragment : Fragment() {
 
     override fun onResume() {
         observe(homeViewModel!!.subscribed) {
-            (vertical_grid_view?.adapter as? MasterCardAdapter)?.notifyDataSetChanged()
+            (fv<androidx.leanback.widget.VerticalGridView>(R.id.vertical_grid_view)?.adapter as? MasterCardAdapter)?.notifyDataSetChanged()
         }
         observe(homeViewModel!!.favorites) {
-            (vertical_grid_view?.adapter as? MasterCardAdapter)?.notifyDataSetChanged()
+            (fv<androidx.leanback.widget.VerticalGridView>(R.id.vertical_grid_view)?.adapter as? MasterCardAdapter)?.notifyDataSetChanged()
         }
         thread {
             context?.requestHome()
@@ -141,7 +141,7 @@ class MainFragment : Fragment() {
             homeLoaded(it)
         }
         Handler().postDelayed({
-            search_icon?.requestFocus()
+            fv<android.widget.ImageView>(R.id.search_icon)?.requestFocus()
         }, 200L)
 
 

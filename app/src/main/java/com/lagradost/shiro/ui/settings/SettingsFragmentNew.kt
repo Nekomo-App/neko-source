@@ -1,4 +1,5 @@
 package com.lagradost.shiro.ui.settings
+import com.lagradost.shiro.utils.fv
 
 import ANILIST_USER_KEY
 import DataStore.getKey
@@ -35,7 +36,6 @@ import com.lagradost.shiro.utils.AppUtils.observe
 import com.lagradost.shiro.utils.MALApi
 import com.lagradost.shiro.utils.MALApi.Companion.getMalUser
 import com.lagradost.shiro.utils.MAL_ACCOUNT_ID
-import kotlinx.android.synthetic.main.fragment_settings.*
 import kotlin.concurrent.thread
 
 class SettingsFragmentNew : Fragment() {
@@ -66,15 +66,15 @@ class SettingsFragmentNew : Fragment() {
             Pair("Updates", R.xml.settings_update_info),
             Pair("About", R.xml.settings_about),
         )*/
-        account_icon?.isVisible = tvActivity == null
+        fv<android.widget.LinearLayout>(R.id.account_icon)?.isVisible = tvActivity == null
         val array = arrayOf(
-            Pair(settings_general, R.xml.settings_general),
-            Pair(settings_style, R.xml.custom_pref_cyanea),
-            Pair(settings_player, R.xml.settings_player),
-            Pair(settings_accounts, R.xml.settings_accounts),
-            Pair(settings_history, R.xml.settings_history),
-            Pair(settings_updates, R.xml.settings_update_info),
-            Pair(settings_about, R.xml.settings_about),
+            Pair(fv<android.widget.TextView>(R.id.settings_general), R.xml.settings_general),
+            Pair(fv<android.widget.TextView>(R.id.settings_style), R.xml.custom_pref_cyanea),
+            Pair(fv<android.widget.TextView>(R.id.settings_player), R.xml.settings_player),
+            Pair(fv<android.widget.TextView>(R.id.settings_accounts), R.xml.settings_accounts),
+            Pair(fv<android.widget.TextView>(R.id.settings_history), R.xml.settings_history),
+            Pair(fv<android.widget.TextView>(R.id.settings_updates), R.xml.settings_update_info),
+            Pair(fv<android.widget.TextView>(R.id.settings_about), R.xml.settings_about),
         )
 
         array.forEach { pair ->
@@ -95,8 +95,8 @@ class SettingsFragmentNew : Fragment() {
             LinearLayout.LayoutParams.MATCH_PARENT, // view width
             MainActivity.statusHeight // view height
         )
-        top_padding_settings?.layoutParams = topParams
-        settings_root?.background = ColorDrawable(Cyanea.instance.backgroundColor)
+        fv<android.view.View>(R.id.top_padding_settings)?.layoutParams = topParams
+        fv<android.widget.LinearLayout>(R.id.settings_root)?.background = ColorDrawable(Cyanea.instance.backgroundColor)
 
         if (tvActivity == null) {
             // Because the user isn't necessarily fetched
@@ -146,22 +146,22 @@ class SettingsFragmentNew : Fragment() {
         }
 
         if (userName != null) {
-            name_text?.text = userName
-            name_text?.visibility = VISIBLE
+            fv<android.widget.TextView>(R.id.name_text)?.text = userName
+            fv<android.widget.TextView>(R.id.name_text)?.visibility = VISIBLE
         } else {
-            name_text?.visibility = INVISIBLE
+            fv<android.widget.TextView>(R.id.name_text)?.visibility = INVISIBLE
         }
 
-        icon_image?.setOnClickListener {
-            name_text?.isVisible = !(name_text?.isVisible ?: false)
+        fv<android.widget.ImageView>(R.id.icon_image)?.setOnClickListener {
+            fv<android.widget.TextView>(R.id.name_text)?.isVisible = !(fv<android.widget.TextView>(R.id.name_text)?.isVisible ?: false)
         }
 
         context?.let { context ->
-            icon_image?.let {
+            fv<android.widget.ImageView>(R.id.icon_image)?.let {
                 GlideApp.with(context)
                     .load(userImage ?: "")
                     .transition(DrawableTransitionOptions.withCrossFade(100))
-                    .error(R.drawable.shiro_logo_rounded)
+                    .error(R.drawable.nekomo_logo)
                     .into(it)
             }
         }
@@ -180,7 +180,7 @@ class SettingsFragmentNew : Fragment() {
     }
 
     override fun onResume() {
-        val settingsManager = PreferenceManager.getDefaultSharedPreferences(activity)
+        val settingsManager = PreferenceManager.getDefaultSharedPreferences(requireContext())
         activity?.changeStatusBarState(settingsManager.getBoolean("statusbar_hidden", true))?.let {
             statusHeight = it
         }

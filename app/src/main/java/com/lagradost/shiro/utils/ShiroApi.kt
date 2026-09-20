@@ -33,7 +33,6 @@ import com.lagradost.shiro.utils.AppUtils.md5
 import com.lagradost.shiro.utils.AppUtils.settingsManager
 import com.lagradost.shiro.utils.Coroutines.main
 import com.lagradost.shiro.utils.mvvm.logError
-import io.michaelrocks.paranoid.Obfuscate
 import khttp.structures.cookie.CookieJar
 import java.net.URLEncoder
 import kotlin.concurrent.thread
@@ -41,7 +40,6 @@ import kotlin.concurrent.thread
 const val SHIRO_TIMEOUT_TIME = 60.0
 const val MAIN_URL = "********"
 
-@Obfuscate
 class ShiroApi {
 
     data class Token(
@@ -195,7 +193,7 @@ class ShiroApi {
         const val maxStale = 60 * 10 // 10m
 
         const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; rv:68.0) Gecko/20100101 Firefox/68.0"
-        private val mapper = JsonMapper.builder().addModule(KotlinModule())
+        private val mapper = JsonMapper.builder().addModule(KotlinModule.Builder().build())
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).build()
 
         // NULL IF ERROR
@@ -277,18 +275,12 @@ class ShiroApi {
         }
 
         fun getSearchMethods(): List<String>? {
-            try {
-                // Tags and years can be added
-                //val url = "********${usedToken?.token}".replace("+", "%20")
-                val url = "$MAIN_URL/api/anime?t=genres"
-                // Security headers
-                val headers = mapOf("X-API-KEY" to BuildConfig.ID)
-                val res = khttp.get(url, headers = headers).text
-                return res.toKotlinObject<AllSearchMethods>().data
+            return try {
+                LiveApi.getGenres()
             } catch (e: Exception) {
                 logError(e)
+                null
             }
-            return null
         }
 
         data class AllAnimeJson(
@@ -336,17 +328,12 @@ class ShiroApi {
         )
 
         private fun getTrending(hideChinese: Boolean = false): ShowHolder? {
-            try {
-                val chineseQuery = if (hideChinese) "&hideChinese=1" else ""
-                val url = "$MAIN_URL/api/anime?t=trending$chineseQuery"
-                val oneHourStale = 60 * 60
-                val headers = mapOf("X-API-KEY" to BuildConfig.ID, "Cache-Control" to "max-stale=$oneHourStale")
-                val res = khttp.get(url, headers = headers).text
-                return res.toKotlinObject()
+            return try {
+                LiveApi.getTrending()
             } catch (e: Exception) {
                 logError(e)
+                null
             }
-            return null
         }
 
 
@@ -379,25 +366,12 @@ class ShiroApi {
         )
 
         private fun getRecents(hideChinese: Boolean = false): List<AnimeHolder>? {
-            try {
-                val chineseQuery = if (hideChinese) "&hideChinese=1" else ""
-                val url = "$MAIN_URL/api/anime?t=recents$chineseQuery"
-                val oneHourStale = 60 * 60
-                val headers = mapOf("X-API-KEY" to BuildConfig.ID, "Cache-Control" to "max-stale=$oneHourStale")
-                val res = khttp.get(url, headers = headers).text
-
-                val typeReference = object : TypeReference<Map<String, AnimeHolder>>() {}
-                val data = mapper.readValue(
-                    mapper.readTree(res).findPath("data")
-                        .toString(), typeReference
-                ).map {
-                    it.value
-                }
-                return data
+            return try {
+                LiveApi.getRecents()
             } catch (e: Exception) {
                 logError(e)
+                null
             }
-            return null
         }
 
         data class Random(
@@ -407,15 +381,12 @@ class ShiroApi {
         )
 
         fun getRandom(): Random? {
-            try {
-                val url = "$MAIN_URL/api/anime?t=random&id=anime"
-                val headers = mapOf("X-API-KEY" to BuildConfig.ID)
-                val res = khttp.get(url, headers = headers).text
-                return res.toKotlinObject()
+            return try {
+                LiveApi.getRandom()
             } catch (e: Exception) {
                 logError(e)
+                null
             }
-            return null
         }
 
         data class AnimePageNewRoot(
@@ -475,15 +446,12 @@ class ShiroApi {
 
         fun getAnimePageNewMal(malId: String): AnimePageNewRoot? {
             println("Loading mal page $malId")
-            try {
-                val url = "$MAIN_URL/api/anime?t=mal&id=$malId"
-                val headers = mapOf("X-API-KEY" to BuildConfig.ID, "Cache-Control" to "max-stale=600")
-                val res = khttp.get(url, headers = headers)
-                return res.text.toKotlinObject()
+            return try {
+                LiveApi.getAnimePageByMal(malId)
             } catch (e: Exception) {
                 logError(e)
+                null
             }
-            return null
         }
 
         data class EpisodeObject(
@@ -493,16 +461,12 @@ class ShiroApi {
 
         fun getAnimePageNew(slug: String): AnimePageNewRoot? {
             println("Loading anime page $slug")
-            try {
-                val url = "$MAIN_URL/api/anime?t=slug&slug=$slug"
-                val headers = mapOf("X-API-KEY" to BuildConfig.ID, "Cache-Control" to "max-stale=600")
-                val res = khttp.get(url, headers = headers)
-                if (res.text.contains("""{"status":"error","message":"Could not find anime","data":[]}""")) return null
-                return res.text.toKotlinObject()
+            return try {
+                LiveApi.getAnimePage(slug)
             } catch (e: Exception) {
                 logError(e)
+                null
             }
-            return null
         }
 
         fun getMalIDFromTitle(title: String): String? {
@@ -622,37 +586,17 @@ class ShiroApi {
 
 
         fun searchNew(query: String, genres: List<String>? = null, hideChinese: Boolean = false): List<Data>? {
-            try {
-                val chineseQuery = if (hideChinese) "&language=ignore_chinese" else ""
-                val url = "$MAIN_URL/api/anime?t=search&name=${
-                    URLEncoder.encode(
-                        query,
-                        "UTF-8"
-                    )
-                }&genres=${
-                    (genres ?: listOf()).joinToString(",")
-                }$chineseQuery"
-//                val oneDayStale = 60 * 60 * 24
-                val headers = mapOf("X-API-KEY" to BuildConfig.ID, "Cache-Control" to "max-stale=86400")
-                val res = khttp.get(url, headers = headers).text
-                return res.toKotlinObject<SearchNew>().data
+            return try {
+                LiveApi.search(query, genres)
             } catch (e: Exception) {
                 logError(e)
+                null
             }
-            return null
         }
 
         fun getFullUrlCdn(url: String): String {
-            if (url.contains("anilist")) return url
-            val fixedUrl = if (!url.startsWith("http")) {
-                "********/${
-                    url
-                }"
-            } else url
-            return fixedUrl.removePrefix("/").replace("-dubbed", "-dub")
-                .replace("/anime/poster/", "/poster/")
-                .replace(".jpg", ".webp")
-                .replace(".png", ".webp")
+            // New backend serves absolute image urls (anilistcdn/allanime)
+            return url.removePrefix("/").replace("-dubbed", "-dub")
         }
 
         /*val lastCards = hashMapOf<String, Card>()

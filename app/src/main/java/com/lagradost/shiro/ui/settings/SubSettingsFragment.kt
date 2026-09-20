@@ -38,8 +38,6 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
 import com.bumptech.glide.Glide
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.messaging.ktx.messaging
 import com.lagradost.shiro.BuildConfig
 import com.lagradost.shiro.R
 import com.lagradost.shiro.ui.library.LibraryFragment.Companion.libraryViewModel
@@ -168,42 +166,9 @@ class SubSettingsFragment : PreferenceFragmentCompat() {
                     return@setOnPreferenceChangeListener true
                 }*/
 
-                val subToAnnouncements = findPreference("subscribe_to_announcements") as SwitchPreference?
-                subToAnnouncements?.setOnPreferenceChangeListener { _, newValue ->
-                    subToAnnouncements.isEnabled = false
-                    if (newValue == true) {
-                        Firebase.messaging.subscribeToTopic("subscribe_to_announcements")
-                            .addOnCompleteListener { task ->
-                                val msg = if (task.isSuccessful) {
-                                    subToAnnouncements.isChecked = true
-                                    "Subscribed"
-                                } else {
-                                    "Subscription failed :("
-                                }
-                                //Log.d(TAG, msg)
-                                context?.let {
-                                    Toast.makeText(it, msg, Toast.LENGTH_SHORT).show()
-                                }
-                                subToAnnouncements.isEnabled = true
-                            }
-                    } else {
-                        Firebase.messaging.unsubscribeFromTopic("subscribe_to_announcements")
-                            .addOnCompleteListener { task ->
-                                val msg = if (task.isSuccessful) {
-                                    subToAnnouncements.isChecked = false
-                                    "Unsubscribed"
-                                } else {
-                                    "Unsubscribing failed :("
-                                }
-                                //Log.d(TAG, msg)
-                                context?.let {
-                                    Toast.makeText(it, msg, Toast.LENGTH_SHORT).show()
-                                }
-                                subToAnnouncements.isEnabled = true
-                            }
-                    }
-                    return@setOnPreferenceChangeListener false
-                }
+                // Push announcements were backed by Firebase on the old backend;
+                // hide the switch rather than leave an inert toggle.
+                findPreference<Preference>("subscribe_to_announcements")?.isVisible = false
 
                 /** End of General settings */
             }
@@ -521,42 +486,7 @@ class SubSettingsFragment : PreferenceFragmentCompat() {
                     return@setOnPreferenceClickListener true
                 }
 
-                val subToUpdates = findPreference("subscribe_to_updates") as SwitchPreference?
-                subToUpdates?.setOnPreferenceChangeListener { _, newValue ->
-                    subToUpdates.isEnabled = false
-                    if (newValue == true) {
-                        Firebase.messaging.subscribeToTopic("subscribe_to_updates")
-                            .addOnCompleteListener { task ->
-                                val msg = if (task.isSuccessful) {
-                                    subToUpdates.isChecked = true
-                                    "Subscribed"
-                                } else {
-                                    "Subscription failed :("
-                                }
-                                //Log.d(TAG, msg)
-                                context?.let {
-                                    Toast.makeText(it, msg, Toast.LENGTH_SHORT).show()
-                                }
-                                subToUpdates.isEnabled = true
-                            }
-                    } else {
-                        Firebase.messaging.unsubscribeFromTopic("subscribe_to_updates")
-                            .addOnCompleteListener { task ->
-                                val msg = if (task.isSuccessful) {
-                                    subToUpdates.isChecked = false
-                                    "Unsubscribed"
-                                } else {
-                                    "Unsubscribing failed :("
-                                }
-                                //Log.d(TAG, msg)
-                                context?.let {
-                                    Toast.makeText(it, msg, Toast.LENGTH_SHORT).show()
-                                }
-                                subToUpdates.isEnabled = true
-                            }
-                    }
-                    return@setOnPreferenceChangeListener false
-                }
+                findPreference<Preference>("subscribe_to_updates")?.isVisible = false
 
                 val versionButton = findPreference("version") as Preference?
                 versionButton?.summary = BuildConfig.VERSION_NAME + " Built on " + BuildConfig.BUILDDATE

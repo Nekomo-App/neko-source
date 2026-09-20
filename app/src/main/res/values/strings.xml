@@ -6,7 +6,7 @@
         + Added anime trailer\n
         + Crashfixes\n
     </string>
-    <string name="app_name">Shiro</string>
+    <string name="app_name">Nekomo</string>
     <string name="title_home">Home</string>
     <string name="title_search">Search</string>
     <string name="title_settings">Settings</string>
@@ -26,9 +26,7 @@
     <string name="resultpage1">Download something to make it show up here</string>
     <string name="resultpage2">Downloads unavailable</string>
     <string name="error_connecting_reload">Error Connecting, Reload</string>
-    <string name="acra_report_toast">Sorry, the application crashed. An anonymous bug report will be sent to the
-        developers :)
-    </string>
+    <string name="acra_report_toast">Sorry, the application crashed :(</string>
     <string name="pref_disable_acra">Disable automatic bug reporting</string>
     <string name="downloads">Downloads</string>
     <string name="latest_anime">Latest anime</string>

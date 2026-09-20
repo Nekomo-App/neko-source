@@ -1,4 +1,5 @@
 package com.lagradost.shiro.ui.home
+import com.lagradost.shiro.utils.fv
 
 import DataStore.removeKey
 import VIEW_LST_KEY
@@ -31,10 +32,6 @@ import com.lagradost.shiro.utils.AppUtils.onLongCardClick
 import com.lagradost.shiro.utils.ShiroApi
 import com.lagradost.shiro.utils.ShiroApi.Companion.getFullUrlCdn
 import com.lagradost.shiro.utils.ShiroApi.Companion.requestHome
-import kotlinx.android.synthetic.main.home_card.view.home_card_root
-import kotlinx.android.synthetic.main.home_card.view.imageText
-import kotlinx.android.synthetic.main.home_card.view.imageView
-import kotlinx.android.synthetic.main.home_card_recently_seen.view.*
 
 
 class CardContinueAdapter(
@@ -59,10 +56,10 @@ class CardContinueAdapter(
             }
         }
 
-        holder.itemView.home_card_recently_seen.setCardBackgroundColor(Cyanea.instance.backgroundColorDark)
+        holder.itemView.fv<androidx.cardview.widget.CardView>(R.id.home_card_recently_seen).setCardBackgroundColor(Cyanea.instance.backgroundColorDark)
         holder.itemView.setOnFocusChangeListener { view, hasFocus ->
             val subFocus =
-                view.tv_button_info.hasFocus() || view.tv_button_cancel.hasFocus() || view.tv_button_remove.hasFocus()
+                view.fv<android.widget.Button>(R.id.tv_button_info).hasFocus() || view.fv<android.widget.Button>(R.id.tv_button_cancel).hasFocus() || view.fv<android.widget.Button>(R.id.tv_button_remove).hasFocus()
             val toSize = if (hasFocus) 1.1f else 1.0f
             val fromSize = if (!hasFocus) 1.1f else 1.0f
             val animation = ScaleAnimation(
@@ -79,8 +76,8 @@ class CardContinueAdapter(
             animation.isFillEnabled = true
             animation.fillAfter = true
             view.startAnimation(animation)
-            if (!subFocus) view.menu_root.visibility = GONE
-            view.home_card_recently_seen.radius = if (hasFocus) 0F else 6.toPx.toFloat()
+            if (!subFocus) view.fv<androidx.constraintlayout.widget.ConstraintLayout>(R.id.menu_root).visibility = GONE
+            view.fv<androidx.cardview.widget.CardView>(R.id.home_card_recently_seen).radius = if (hasFocus) 0F else 6.toPx.toFloat()
             if (isOnTop) {
                 activity.findViewById<View>(R.id.tv_menu_bar)?.visibility = VISIBLE
             } else {
@@ -95,7 +92,7 @@ class CardContinueAdapter(
     }
 
     class CardViewHolder(itemView: View, val activity: FragmentActivity) : RecyclerView.ViewHolder(itemView) {
-        val card: ImageView = itemView.imageView
+        val card: ImageView = itemView.fv<android.widget.ImageView>(R.id.imageView)
         fun bind(cardInfo: LastEpisodeInfo?) {
             if (cardInfo?.data != null) {
                 if (tvActivity != null) {
@@ -118,26 +115,26 @@ class CardContinueAdapter(
                     .load(glideUrl)
                     .transition(DrawableTransitionOptions.withCrossFade(100))
                     .onlyRetrieveFromCache(savingData)
-                    .into(card.imageView)
+                    .into(card.fv<android.widget.ImageView>(R.id.imageView))
 
                 itemView.animate().scaleX(1.0f).scaleY(1.0f).setDuration(300).start()
                 val episodeOffset =
                     if (cardInfo.data.episodes.filter { it.episode == "0" }.isNullOrEmpty()) 0 else -1
-                itemView.imageText?.text =
+                itemView.fv<android.widget.TextView>(R.id.imageText)?.text =
                     if (cardInfo.data.anime.title.endsWith("(Dub)")) "✦ Episode ${cardInfo.episodeIndex + 1 + episodeOffset}" else "Episode ${cardInfo.episodeIndex + 1 + episodeOffset}"
                 if (tvActivity == null) {
-                    itemView.infoButton.visibility = VISIBLE
-                    itemView.infoButton.setOnClickListener {
+                    itemView.fv<android.widget.ImageView>(R.id.infoButton).visibility = VISIBLE
+                    itemView.fv<android.widget.ImageView>(R.id.infoButton).setOnClickListener {
                         activity.loadPage(cardInfo.data.anime.slug, cardInfo.title)
                     }
-                    itemView.infoButton.setOnLongClickListener {
+                    itemView.fv<android.widget.ImageView>(R.id.infoButton).setOnLongClickListener {
                         Toast.makeText(activity, cardInfo.title, Toast.LENGTH_LONG).show()
                         return@setOnLongClickListener true
                     }
                 } else {
                     // TV INFO BUTTON
-                    itemView.infoButton.visibility = GONE
-                    itemView.tv_button_info.setOnClickListener {
+                    itemView.fv<android.widget.ImageView>(R.id.infoButton).visibility = GONE
+                    itemView.fv<android.widget.Button>(R.id.tv_button_info).setOnClickListener {
                         activity.loadPage(
                             cardInfo.data.anime.slug,
                             cardInfo.title
@@ -145,11 +142,11 @@ class CardContinueAdapter(
                     }
                 }
 
-                itemView.home_card_root.setOnLongClickListener {
+                itemView.fv<android.widget.LinearLayout>(R.id.home_card_root).setOnLongClickListener {
                     if (tvActivity != null) {
-                        itemView.menu_root.visibility = VISIBLE
-                        itemView.tv_button_info.requestFocus()
-                        itemView.home_card_root.isFocusable = false
+                        itemView.fv<androidx.constraintlayout.widget.ConstraintLayout>(R.id.menu_root).visibility = VISIBLE
+                        itemView.fv<android.widget.Button>(R.id.tv_button_info).requestFocus()
+                        itemView.fv<android.widget.LinearLayout>(R.id.home_card_root).isFocusable = false
                     } else {
                         cardInfo.data.let { card ->
                             itemView.scaleY = 0.9f
@@ -167,7 +164,7 @@ class CardContinueAdapter(
                     }
                     return@setOnLongClickListener true
                 }
-                itemView.home_card_root.setOnClickListener {
+                itemView.fv<android.widget.LinearLayout>(R.id.home_card_root).setOnClickListener {
                     cardInfo.data.let { data ->
                         activity.loadPlayer(
                             cardInfo.episodeIndex,
@@ -180,19 +177,19 @@ class CardContinueAdapter(
                     }
                 }
                 if (tvActivity != null) {
-                    itemView.removeButton.visibility = GONE
-                    itemView.tv_button_cancel.setOnClickListener {
-                        itemView.home_card_root.isFocusable = true
-                        itemView.menu_root.visibility = GONE
-                        itemView.home_card_root.requestFocus()
+                    itemView.fv<android.widget.ImageView>(R.id.removeButton).visibility = GONE
+                    itemView.fv<android.widget.Button>(R.id.tv_button_cancel).setOnClickListener {
+                        itemView.fv<android.widget.LinearLayout>(R.id.home_card_root).isFocusable = true
+                        itemView.fv<androidx.constraintlayout.widget.ConstraintLayout>(R.id.menu_root).visibility = GONE
+                        itemView.fv<android.widget.LinearLayout>(R.id.home_card_root).requestFocus()
                     }
-                    itemView.tv_button_remove.setOnClickListener {
+                    itemView.fv<android.widget.Button>(R.id.tv_button_remove).setOnClickListener {
                         activity.removeKey(VIEW_LST_KEY, cardInfo.slug)
                         activity.requestHome(true)
                     }
                 } else {
-                    itemView.removeButton.visibility = VISIBLE
-                    itemView.removeButton.setOnClickListener {
+                    itemView.fv<android.widget.ImageView>(R.id.removeButton).visibility = VISIBLE
+                    itemView.fv<android.widget.ImageView>(R.id.removeButton).setOnClickListener {
                         activity.removeKey(VIEW_LST_KEY, cardInfo.slug)
                         activity.requestHome(true)
                     }
@@ -204,12 +201,12 @@ class CardContinueAdapter(
                     } else if (progress > 90) {
                         progress = 100
                     }
-                    itemView.video_progress.progress = progress
+                    itemView.fv<androidx.core.widget.ContentLoadingProgressBar>(R.id.video_progress).progress = progress
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        itemView.video_progress.progressTintList = ColorStateList.valueOf(Cyanea.instance.accent)
+                        itemView.fv<androidx.core.widget.ContentLoadingProgressBar>(R.id.video_progress).progressTintList = ColorStateList.valueOf(Cyanea.instance.accent)
                     }
-                    itemView.video_progress.layoutParams =
-                        (itemView.video_progress.layoutParams as? ViewGroup.MarginLayoutParams)?.apply {
+                    itemView.fv<androidx.core.widget.ContentLoadingProgressBar>(R.id.video_progress).layoutParams =
+                        (itemView.fv<androidx.core.widget.ContentLoadingProgressBar>(R.id.video_progress).layoutParams as? ViewGroup.MarginLayoutParams)?.apply {
                             updateMargins(
                                 0,
                                 0,
@@ -219,7 +216,7 @@ class CardContinueAdapter(
                             )
                         }
                 } else {
-                    itemView.video_progress?.alpha = 0f
+                    itemView.fv<androidx.core.widget.ContentLoadingProgressBar>(R.id.video_progress)?.alpha = 0f
                 }
             }
         }

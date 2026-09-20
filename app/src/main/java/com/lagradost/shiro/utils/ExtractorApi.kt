@@ -30,7 +30,8 @@ fun getAndUnpack(string: String): String? {
 
 val APIS: Array<ExtractorApi> = arrayOf(
     // AllProvider(),
-    Shiro(),
+    // Shiro() removed: subsplea.se is dead and its getUrl blindly emits any
+    // url as a fake UHD link, poisoning link priority for embed pages.
     MultiQuality(),
     Mp4Upload(),
     StreamTape(),

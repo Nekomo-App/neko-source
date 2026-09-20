@@ -1,4 +1,15 @@
 # Add project specific ProGuard rules here.
+
+# Annotation-processor / compile-time-only classes referenced by jars
+-dontwarn javax.lang.model.**
+-dontwarn com.google.auto.**
+-dontwarn org.jspecify.**
+
+# WebView JS bridge — the site crypto bridge must keep its @JavascriptInterface method
+-keepclassmembers class com.lagradost.shiro.utils.Mkissa$Bridge {
+    @android.webkit.JavascriptInterface <methods>;
+}
+-keepattributes JavascriptInterface
 # You can control the set of applied configuration files using the
 # proguardFiles setting in build.gradle.
 #

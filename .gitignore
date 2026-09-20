@@ -12,3 +12,7 @@
 /captures
 .externalNativeBuild
 .cxx
+
+# Release signing (local only)
+nekomo-release.jks
+keystore.properties

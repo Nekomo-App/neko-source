@@ -1,4 +1,5 @@
 package com.lagradost.shiro.ui.home
+import com.lagradost.shiro.utils.fv
 
 import DataStore.getKey
 import DataStore.mapper
@@ -44,8 +45,6 @@ import com.lagradost.shiro.utils.ShiroApi.Companion.hasThrownError
 import com.lagradost.shiro.utils.ShiroApi.Companion.initShiroApi
 import com.lagradost.shiro.utils.ShiroApi.Companion.requestHome
 import com.lagradost.shiro.utils.mvvm.normalSafeApiCall
-import kotlinx.android.synthetic.main.download_card.*
-import kotlinx.android.synthetic.main.fragment_home.*
 import kotlin.concurrent.thread
 
 //const val MAXIMUM_FADE = 0.3f
@@ -70,36 +69,36 @@ class HomeFragment : Fragment() {
 
     private fun homeLoaded(data: ShiroApi.ShiroHomePageNew?) {
         activity?.runOnUiThread {
-            /*trending_anime_scroll_view.removeAllViews()
-            recentlySeenScrollView.removeAllViews()
-            recently_updated_scroll_view.removeAllViews()
-            favouriteScrollView.removeAllViews()
-            scheduleScrollView.removeAllViews()
+            /*fv<androidx.recyclerview.widget.RecyclerView>(R.id.trending_anime_scroll_view).removeAllViews()
+            fv<androidx.recyclerview.widget.RecyclerView>(R.id.recentlySeenScrollView).removeAllViews()
+            fv<androidx.recyclerview.widget.RecyclerView>(R.id.recently_updated_scroll_view).removeAllViews()
+            fv<androidx.recyclerview.widget.RecyclerView>(R.id.favouriteScrollView).removeAllViews()
+            fv<androidx.recyclerview.widget.RecyclerView>(R.id.scheduleScrollView).removeAllViews()
 */
             //val cardInfo = data?.homeSlidesData?.shuffled()?.take(1)?.get(0)
             /*val glideUrl = GlideUrl("https://fastani.net/" + cardInfo?.bannerImage) { FastAniApi.currentHeaders }
             context?.let {
                 GlideApp.with(it)
                     .load(glideUrl)
-                    .into(main_backgroundImage)
+                    .into(fv<android.widget.ImageView>(R.id.main_backgroundImage))
             }*/
 
 
             //"http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
 
-            /*main_poster.setOnClickListener {
+            /*fv<android.widget.ImageView>(R.id.main_poster).setOnClickListener {
                 MainActivity.loadPage(cardInfo!!)
                 // MainActivity.loadPlayer(0, 0, cardInfo!!)
             }*/
 
             if (settingsManager?.getBoolean("swipe_to_refresh", true) == true) {
-                home_swipe_refresh?.isEnabled = true
-                home_swipe_refresh.setOnRefreshListener {
+                fv<androidx.swiperefreshlayout.widget.SwipeRefreshLayout>(R.id.home_swipe_refresh)?.isEnabled = true
+                fv<androidx.swiperefreshlayout.widget.SwipeRefreshLayout>(R.id.home_swipe_refresh).setOnRefreshListener {
                     generateRandom()
-                    home_swipe_refresh.isRefreshing = false
+                    fv<androidx.swiperefreshlayout.widget.SwipeRefreshLayout>(R.id.home_swipe_refresh).isRefreshing = false
                 }
             } else {
-                home_swipe_refresh?.isEnabled = false
+                fv<androidx.swiperefreshlayout.widget.SwipeRefreshLayout>(R.id.home_swipe_refresh)?.isEnabled = false
             }
 
 
@@ -114,7 +113,7 @@ class HomeFragment : Fragment() {
                         it.slug,
                         it.title_english
                     )
-                }, trending_anime_scroll_view, trending_text)
+                }, fv<androidx.recyclerview.widget.RecyclerView>(R.id.trending_anime_scroll_view), fv<android.widget.TextView>(R.id.trending_text))
                 activity?.displayCardData(
                     data.recents?.map {
                         ShiroApi.CommonAnimePageData(
@@ -123,8 +122,8 @@ class HomeFragment : Fragment() {
                             it.anime.slug,
                         )
                     }?.distinctBy { it.slug },
-                    recently_updated_scroll_view,
-                    recently_updated_text
+                    fv<androidx.recyclerview.widget.RecyclerView>(R.id.recently_updated_scroll_view),
+                    fv<android.widget.TextView>(R.id.recently_updated_text)
                 )
 //                activity?.displayCardData(data.data.ongoing_animes, ongoing_anime_scroll_view, ongoing_anime_text)
 //                activity?.displayCardData(data.data.latest_animes, latest_anime_scroll_view, latest_anime_text)
@@ -135,30 +134,30 @@ class HomeFragment : Fragment() {
 
             /*
             if (data?.schedule?.isNotEmpty() == true) {
-                scheduleRoot.visibility = VISIBLE
+                fv<android.widget.LinearLayout>(R.id.scheduleRoot).visibility = VISIBLE
                 //println(data.favorites!!.map { it?.title?.english})
-                displayCardData(data.schedule, scheduleScrollView)
+                displayCardData(data.schedule, fv<androidx.recyclerview.widget.RecyclerView>(R.id.scheduleScrollView))
             } else {
-                scheduleRoot.visibility = GONE
+                fv<android.widget.LinearLayout>(R.id.scheduleRoot).visibility = GONE
             }
 
 */
             val transition: Transition = ChangeBounds()
             transition.duration = 100
             if (data?.recentlySeen?.isNotEmpty() == true) {
-                recentlySeenRoot.visibility = VISIBLE
+                fv<android.widget.LinearLayout>(R.id.recentlySeenRoot).visibility = VISIBLE
                 //println(data.recentlySeen)
-                activity?.displayCardData(data.recentlySeen, recentlySeenScrollView)
+                activity?.displayCardData(data.recentlySeen, fv<androidx.recyclerview.widget.RecyclerView>(R.id.recentlySeenScrollView))
             } else {
-                recentlySeenRoot.visibility = GONE
+                fv<android.widget.LinearLayout>(R.id.recentlySeenRoot).visibility = GONE
             }
-            TransitionManager.beginDelayedTransition(main_scroll, transition)
-            main_load?.alpha = 0f
-            main_scroll?.alpha = 1f
+            TransitionManager.beginDelayedTransition(fv<com.nirhart.parallaxscroll.views.ParallaxScrollView>(R.id.main_scroll), transition)
+            fv<android.widget.ProgressBar>(R.id.main_load)?.alpha = 0f
+            fv<com.nirhart.parallaxscroll.views.ParallaxScrollView>(R.id.main_scroll)?.alpha = 1f
 
-            main_reload_data_btt?.alpha = 0f
-            main_reload_data_btt?.isClickable = false
-            main_layout?.setPadding(0, MainActivity.statusHeight, 0, 0)
+            fv<android.widget.Button>(R.id.main_reload_data_btt)?.alpha = 0f
+            fv<android.widget.Button>(R.id.main_reload_data_btt)?.isClickable = false
+            fv<android.widget.LinearLayout>(R.id.main_layout)?.setPadding(0, MainActivity.statusHeight, 0, 0)
         }
     }
 
@@ -177,19 +176,19 @@ class HomeFragment : Fragment() {
             activity?.runOnUiThread {
                 try {
                     if (randomData != null) {
-                        // This can throw NPE as main_layout isn't guaranteed to be inflated
+                        // This can throw NPE as fv<android.widget.LinearLayout>(R.id.main_layout) isn't guaranteed to be inflated
                         val transition: Transition = ChangeBounds()
                         transition.duration = 100 // DURATION OF ANIMATION IN MS
-                        TransitionManager.beginDelayedTransition(main_layout, transition)
-                        main_poster_holder.visibility = VISIBLE
-                        main_poster_text_holder.visibility = VISIBLE
+                        TransitionManager.beginDelayedTransition(fv<android.widget.LinearLayout>(R.id.main_layout), transition)
+                        fv<android.widget.FrameLayout>(R.id.main_poster_holder).visibility = VISIBLE
+                        fv<android.widget.LinearLayout>(R.id.main_poster_text_holder).visibility = VISIBLE
                         val marginParams: FrameLayout.LayoutParams = FrameLayout.LayoutParams(
                             LinearLayoutCompat.LayoutParams.MATCH_PARENT, // view width
                             LinearLayoutCompat.LayoutParams.WRAP_CONTENT, // view height
                         )
 
                         marginParams.setMargins(0, 250.toPx, 0, 0)
-                        main_layout.layoutParams = marginParams
+                        fv<android.widget.LinearLayout>(R.id.main_layout).layoutParams = marginParams
 
                         val glideUrlMain = getFullUrlCdn(randomData.poster)
                         context?.let {
@@ -201,16 +200,16 @@ class HomeFragment : Fragment() {
                                 .transform(PositionedCropTransformation(1f, 0f))
                                 .transition(DrawableTransitionOptions.withCrossFade(100))
                                 .onlyRetrieveFromCache(savingData)
-                                .into(main_poster)
+                                .into(fv<android.widget.ImageView>(R.id.main_poster))
                         }
 
-                        main_name?.text = randomData.title
+                        fv<android.widget.TextView>(R.id.main_name)?.text = randomData.title
                         normalSafeApiCall {
-                            main_genres?.text =
+                            fv<android.widget.TextView>(R.id.main_genres)?.text =
                                 mapper.readValue<List<String>>(randomData.genres)
                                     .joinToString(prefix = "", postfix = "", separator = " • ")
                         }
-                        main_watch_button.setOnClickListener {
+                        fv<com.google.android.material.button.MaterialButton>(R.id.main_watch_button).setOnClickListener {
                             Toast.makeText(activity, "Loading link", Toast.LENGTH_SHORT).show()
                             thread {
                                 // LETTING USER PRESS STUFF WHEN THIS LOADS CAN CAUSE BUGS
@@ -227,34 +226,32 @@ class HomeFragment : Fragment() {
                                 }
                             }
                         }
-                        main_watch_button.setOnLongClickListener {
+                        fv<com.google.android.material.button.MaterialButton>(R.id.main_watch_button).setOnLongClickListener {
                             //MainActivity.loadPage(cardInfo!!)
-                            if (cardInfo != null) {
-                                val page = getAnimePageNew(randomData.slug)
-                                val nextEpisode = page?.data?.let { it1 -> context?.getNextEpisode(it1) }
-                                if (nextEpisode != null) {
-                                    Toast.makeText(
-                                        activity,
-                                        "Episode ${nextEpisode.episodeIndex + 1}",
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                }
+                            val page = getAnimePageNew(randomData.slug)
+                            val nextEpisode = page?.data?.let { it1 -> context?.getNextEpisode(it1) }
+                            if (nextEpisode != null) {
+                                Toast.makeText(
+                                    activity,
+                                    "Episode ${nextEpisode.episodeIndex + 1}",
+                                    Toast.LENGTH_LONG
+                                ).show()
                             }
                             return@setOnLongClickListener true
                         }
-                        main_info_button.setOnClickListener {
+                        fv<com.google.android.material.button.MaterialButton>(R.id.main_info_button).setOnClickListener {
                             activity?.loadPage(randomData.slug, randomData.title)
                         }
                     } else {
-                        main_poster_holder.visibility = GONE
-                        main_poster_text_holder.visibility = GONE
+                        fv<android.widget.FrameLayout>(R.id.main_poster_holder).visibility = GONE
+                        fv<android.widget.LinearLayout>(R.id.main_poster_text_holder).visibility = GONE
                         val marginParams: FrameLayout.LayoutParams = FrameLayout.LayoutParams(
                             LinearLayoutCompat.LayoutParams.MATCH_PARENT, // view width
                             LinearLayoutCompat.LayoutParams.WRAP_CONTENT, // view height
                         )
 
                         marginParams.setMargins(0)
-                        main_layout.layoutParams = marginParams
+                        fv<android.widget.LinearLayout>(R.id.main_layout).layoutParams = marginParams
                     }
                 } catch (e: java.lang.NullPointerException) {
                     println("NPE in generateRandom!")
@@ -269,14 +266,14 @@ class HomeFragment : Fragment() {
 
     private fun onHomeErrorCatch(fullRe: Boolean) {
         activity?.runOnUiThread {
-            if (main_reload_data_btt != null) {
-                main_reload_data_btt?.alpha = 1f
-                main_load?.alpha = 0f
-                main_reload_data_btt?.isClickable = true
-                main_reload_data_btt?.setOnClickListener {
-                    main_reload_data_btt?.alpha = 0f
-                    main_load?.alpha = 1f
-                    main_reload_data_btt?.isClickable = false
+            if (fv<android.widget.Button>(R.id.main_reload_data_btt) != null) {
+                fv<android.widget.Button>(R.id.main_reload_data_btt)?.alpha = 1f
+                fv<android.widget.ProgressBar>(R.id.main_load)?.alpha = 0f
+                fv<android.widget.Button>(R.id.main_reload_data_btt)?.isClickable = true
+                fv<android.widget.Button>(R.id.main_reload_data_btt)?.setOnClickListener {
+                    fv<android.widget.Button>(R.id.main_reload_data_btt)?.alpha = 0f
+                    fv<android.widget.ProgressBar>(R.id.main_load)?.alpha = 1f
+                    fv<android.widget.Button>(R.id.main_reload_data_btt)?.isClickable = false
                     thread {
                         if (fullRe) {
                             context?.initShiroApi()
@@ -295,16 +292,16 @@ class HomeFragment : Fragment() {
         activity?.runOnUiThread {
             // RELOAD ON NEW FAV!
             if (favorites?.isNotEmpty() == true) {
-                favouriteRoot.visibility = VISIBLE
+                fv<android.widget.LinearLayout>(R.id.favouriteRoot).visibility = VISIBLE
                 //println(data.favorites!!.map { it?.title?.english})
                 activity?.displayCardData(
                     favorites.sortedWith(compareBy { it?.name }).mapNotNull { it }.toList(),
-                    favouriteScrollView,
-                    favorites_text,
+                    fv<androidx.recyclerview.widget.RecyclerView>(R.id.favouriteScrollView),
+                    fv<android.widget.TextView>(R.id.favorites_text),
                     overrideHideDubbed = true
                 )
             } else {
-                favouriteRoot.visibility = GONE
+                fv<android.widget.LinearLayout>(R.id.favouriteRoot).visibility = GONE
             }
         }
     }
@@ -314,16 +311,16 @@ class HomeFragment : Fragment() {
             val subscribed = homeViewModel!!.subscribed.value
             activity?.runOnUiThread {
                 if (subscribed?.isNotEmpty() == true) {
-                    subscribedRoot.visibility = VISIBLE
+                    fv<android.widget.LinearLayout>(R.id.subscribedRoot).visibility = VISIBLE
                     //println(data.favorites!!.map { it?.title?.english})
                     activity?.displayCardData(
                         subscribed.sortedWith(compareBy { it?.name }).mapNotNull { it }.toList(),
-                        subscribedScrollView,
-                        subscribed_text,
+                        fv<androidx.recyclerview.widget.RecyclerView>(R.id.subscribedScrollView),
+                        fv<android.widget.TextView>(R.id.subscribed_text),
                         overrideHideDubbed = true
                     )
                 } else {
-                    subscribedRoot.visibility = GONE
+                    fv<android.widget.LinearLayout>(R.id.subscribedRoot).visibility = GONE
                 }
             }
         }
@@ -348,7 +345,7 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        main_scroll?.alpha = 0f
+        fv<com.nirhart.parallaxscroll.views.ParallaxScrollView>(R.id.main_scroll)?.alpha = 0f
         ShiroApi.onHomeError += ::onHomeErrorCatch
         if (hasThrownError != -1) {
             onHomeErrorCatch(hasThrownError == 1)
@@ -358,7 +355,7 @@ class HomeFragment : Fragment() {
             it.observe(viewLifecycleOwner) { homePage ->
                 homeLoaded(homePage)
             }
-            if (it.value != null && main_load?.alpha == 1.0f) {
+            if (it.value != null && fv<android.widget.ProgressBar>(R.id.main_load)?.alpha == 1.0f) {
                 homeLoaded(it.value)
             }
         }
@@ -369,8 +366,8 @@ class HomeFragment : Fragment() {
         }
 
         // This gets overwritten when data is loaded
-        home_swipe_refresh?.setOnRefreshListener {
-            home_swipe_refresh?.isRefreshing = false
+        fv<androidx.swiperefreshlayout.widget.SwipeRefreshLayout>(R.id.home_swipe_refresh)?.setOnRefreshListener {
+            fv<androidx.swiperefreshlayout.widget.SwipeRefreshLayout>(R.id.home_swipe_refresh)?.isRefreshing = false
         }
 
 
@@ -388,11 +385,11 @@ class HomeFragment : Fragment() {
         }
 
         // CAUSES CRASH ON 6.0.0
-        /*main_scroll.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+        /*fv<com.nirhart.parallaxscroll.views.ParallaxScrollView>(R.id.main_scroll).setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
                val fade = (FADE_SCROLL_DISTANCE - scrollY) / FADE_SCROLL_DISTANCE
                // COLOR ARGB INTRODUCED IN 26!
                val gray: Int = Color.argb(fade, 0f, fade, 0f)
-            //   main_backgroundImage.alpha = maxOf(0f, MAXIMUM_FADE * fade) // DON'T DUE TO ALPHA FADING HINDERING FOREGROUND GRADIENT
+            //   fv<android.widget.ImageView>(R.id.main_backgroundImage).alpha = maxOf(0f, MAXIMUM_FADE * fade) // DON'T DUE TO ALPHA FADING HINDERING FOREGROUND GRADIENT
         }*/
 
     }

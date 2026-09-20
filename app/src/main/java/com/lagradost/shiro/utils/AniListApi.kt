@@ -39,7 +39,7 @@ class AniListApi {
     companion object {
         private val aniListStatusString = arrayOf("CURRENT", "COMPLETED", "PAUSED", "DROPPED", "PLANNING", "REPEATING")
 
-        private val mapper = JsonMapper.builder().addModule(KotlinModule())
+        private val mapper = JsonMapper.builder().addModule(KotlinModule.Builder().build())
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).build()!!
 
 

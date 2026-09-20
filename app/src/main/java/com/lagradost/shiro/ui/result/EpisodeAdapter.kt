@@ -1,4 +1,5 @@
 package com.lagradost.shiro.ui.result
+import com.lagradost.shiro.utils.fv
 
 import DataStore.containsKey
 import VIEWSTATE_KEY
@@ -30,13 +31,6 @@ import com.lagradost.shiro.utils.AppUtils.getViewPosDur
 import com.lagradost.shiro.utils.ShiroApi
 import com.lagradost.shiro.utils.ShiroApi.Companion.getFullUrlCdn
 import com.lagradost.shiro.utils.VideoDownloadManager
-import kotlinx.android.synthetic.main.episode_result.view.*
-import kotlinx.android.synthetic.main.episode_result_compact.view.cardTitle
-import kotlinx.android.synthetic.main.episode_result_compact.view.cdi
-import kotlinx.android.synthetic.main.episode_result_compact.view.episode_result_root
-import kotlinx.android.synthetic.main.episode_result_compact.view.progressBar
-import kotlinx.android.synthetic.main.episode_result_compact.view.video_progress
-import kotlinx.android.synthetic.main.fragment_results.view.*
 import java.util.*
 
 const val ACTION_PLAY_EPISODE_IN_PLAYER = 1
@@ -146,7 +140,7 @@ class EpisodeAdapter(
             //lastSelectedEpisode = position
             if (prevFocus != null) {
                 if (kotlin.math.abs(position - prevFocus!!) > 3 * 2) {
-                    this.resView.episodes_res_view.layoutManager?.scrollToPosition(0)
+                    this.resView.fv<androidx.recyclerview.widget.RecyclerView>(R.id.episodes_res_view).layoutManager?.scrollToPosition(0)
                 }
             }
             prevFocus = position
@@ -181,7 +175,7 @@ class EpisodeAdapter(
         private val downloadClickCallback: (DownloadClickEvent) -> Unit,
     ) :
         RecyclerView.ViewHolder(itemView), DownloadButtonViewHolder {
-        val card: CardView = itemView.episode_result_root
+        val card: CardView = itemView.fv<androidx.cardview.widget.CardView>(R.id.episode_result_root)
         var cardPosition = 0
         override var downloadButton: EasyDownloadButton? = if (tvActivity == null) EasyDownloadButton() else null
 
@@ -195,7 +189,7 @@ class EpisodeAdapter(
             val episodeOffset = if (data.episodes.filter { it.episode == "0" }.isNullOrEmpty()) 0 else -1
 
             downloadButton?.setUpButton(
-                downloadInfo?.fileLength, downloadInfo?.totalBytes, itemView.progressBar, itemView.cdi, null,
+                downloadInfo?.fileLength, downloadInfo?.totalBytes, itemView.fv<androidx.core.widget.ContentLoadingProgressBar>(R.id.progressBar), itemView.fv<android.widget.ImageView>(R.id.cdi), null,
                 AllDataWithId(
                     id,
                     data.anime.slug,
@@ -248,7 +242,7 @@ class EpisodeAdapter(
                 val episodeOffset = if (data.episodes.filter { it.episode == "0" }.isNullOrEmpty()) 0 else -1
                 val episodePos = start + position
                 val id = (data.anime.slug + "E$episodePos").hashCode()
-                card.video_thumbnail?.let {
+                card.fv<android.widget.ImageView>(R.id.video_thumbnail)?.let {
                     data.episodes.getOrNull(episodePos)?.image?.let { thumbnail ->
                         val guaranteedThumbnail = thumbnail.ifBlank { data.anime.poster }
                         val settingsManager = PreferenceManager.getDefaultSharedPreferences(this)
@@ -275,7 +269,7 @@ class EpisodeAdapter(
                         data
                     )
 
-                card.cdi.isVisible = tvActivity == null
+                card.fv<android.widget.ImageView>(R.id.cdi).isVisible = tvActivity == null
                 card.setOnClickListener {
                     clickCallback.invoke(
                         EpisodeClickEvent(
@@ -324,17 +318,17 @@ class EpisodeAdapter(
                     else -> "Episode ${episodePos + 1 + episodeOffset} $fillerSuffix"
                 }
 
-                card.cardTitle?.text = fixedSiteTitle
+                card.fv<android.widget.TextView>(R.id.cardTitle)?.text = fixedSiteTitle
 
-                card.cardSummary?.isVisible = hasDescription
+                card.fv<android.widget.TextView>(R.id.cardSummary)?.isVisible = hasDescription
                 if (hasDescription) {
-                    card.cardSummary?.setOnLongClickListener(longClickListener)
+                    card.fv<android.widget.TextView>(R.id.cardSummary)?.setOnLongClickListener(longClickListener)
                     val summary = data.episodes.getOrNull(episodePos)?.insight?.replace("`", "'") ?: "None"
                     if (summary == "None") {
-                        card.cardSummary?.visibility = GONE
+                        card.fv<android.widget.TextView>(R.id.cardSummary)?.visibility = GONE
                     } else {
-                        card.cardSummary?.text = summary
-                        card.cardSummary?.setOnClickListener {
+                        card.fv<android.widget.TextView>(R.id.cardSummary)?.text = summary
+                        card.fv<android.widget.TextView>(R.id.cardSummary)?.setOnClickListener {
                             val builder: AlertDialog.Builder =
                                 AlertDialog.Builder(this, R.style.AlertDialogCustom)
                             builder.setMessage(summary).setTitle("Insight")
@@ -352,13 +346,13 @@ class EpisodeAdapter(
                     } else if (progress > 90) {
                         progress = 100
                     }
-                    card.video_progress.alpha = 1f
-                    card.video_progress.progress = progress
+                    card.fv<com.google.android.material.progressindicator.LinearProgressIndicator>(R.id.video_progress).alpha = 1f
+                    card.fv<com.google.android.material.progressindicator.LinearProgressIndicator>(R.id.video_progress).progress = progress
                 } else {
-                    card.video_progress.alpha = 0f
+                    card.fv<com.google.android.material.progressindicator.LinearProgressIndicator>(R.id.video_progress).alpha = 0f
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    card.progressBar.progressTintList = ColorStateList.valueOf(Cyanea.instance.accent)
+                    card.fv<androidx.core.widget.ContentLoadingProgressBar>(R.id.progressBar).progressTintList = ColorStateList.valueOf(Cyanea.instance.accent)
                 }
 
 
@@ -379,7 +373,7 @@ class EpisodeAdapter(
                         val last =
                             if (lastDubbed!!.episodeIndex > lastNormal!!.episodeIndex) lastDubbed!! else lastNormal!!
 
-                        card.card_bg.setCardBackgroundColor(
+                        card.fv<androidx.cardview.widget.CardView>(R.id.card_bg).setCardBackgroundColor(
                             Cyanea.instance.backgroundColorDark
                         )
 
@@ -394,11 +388,11 @@ class EpisodeAdapter(
                             )
                             2.toPx
                         }
-                        card.card_bg.layoutParams = card.card_bg.layoutParams.apply {
+                        card.fv<androidx.cardview.widget.CardView>(R.id.card_bg).layoutParams = card.fv<androidx.cardview.widget.CardView>(R.id.card_bg).layoutParams.apply {
                             (this as FrameLayout.LayoutParams).setMargins(margins, margins, margins, margins)
                         }
                     } else {
-                        card.card_bg.setCardBackgroundColor(
+                        card.fv<androidx.cardview.widget.CardView>(R.id.card_bg).setCardBackgroundColor(
                             Cyanea.instance.backgroundColor
                         )
                         card.setCardBackgroundColor(

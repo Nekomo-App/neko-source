@@ -1,4 +1,5 @@
 package com.lagradost.shiro.ui.home
+import com.lagradost.shiro.utils.fv
 
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +13,6 @@ import com.lagradost.shiro.ui.LastEpisodeInfo
 import com.lagradost.shiro.ui.home.HomeFragment.Companion.homeViewModel
 import com.lagradost.shiro.utils.AppUtils.displayCardData
 import com.lagradost.shiro.utils.ShiroApi
-import kotlinx.android.synthetic.main.vertical_grid_view_child.view.*
 
 
 class MasterCardAdapter(
@@ -76,7 +76,7 @@ class MasterCardAdapter(
     }
 
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
-        holder.itemView.horizontalGridView?.adapter = null
+        holder.itemView.fv<androidx.leanback.widget.HorizontalGridView>(R.id.horizontalGridView)?.adapter = null
         holder.itemView.visibility = GONE
         super.onViewRecycled(holder)
     }
@@ -90,7 +90,7 @@ class MasterCardAdapter(
         val card: View = itemView
 
         fun bind(pair: Pair<List<Any?>?, String?>, position: Int) {
-            card.expand_text?.text = pair.second
+            card.fv<android.widget.TextView>(R.id.expand_text)?.text = pair.second
             card.visibility = VISIBLE
             val isOnTop = position == 0
             val isFavorite = activity.getString(R.string.favorites) == pair.second
@@ -98,8 +98,8 @@ class MasterCardAdapter(
                 pair.first as? List<ShiroApi.CommonAnimePage?> != null && pair.second != activity.getString(R.string.continue_watching) -> {
                     activity.displayCardData(
                         pair.first as List<ShiroApi.CommonAnimePage>?,
-                        card.horizontalGridView,
-                        card.expand_text,
+                        card.fv<androidx.leanback.widget.HorizontalGridView>(R.id.horizontalGridView),
+                        card.fv<android.widget.TextView>(R.id.expand_text),
                         isOnTop,
                         overrideHideDubbed = isFavorite
                     )
@@ -107,7 +107,7 @@ class MasterCardAdapter(
                 pair.first as? List<LastEpisodeInfo?> != null -> {
                     activity.displayCardData(
                         pair.first as? List<LastEpisodeInfo>,
-                        card.horizontalGridView,
+                        card.fv<androidx.leanback.widget.HorizontalGridView>(R.id.horizontalGridView),
                         isOnTop
                     )
                 }

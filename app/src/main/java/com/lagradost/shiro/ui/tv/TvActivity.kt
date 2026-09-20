@@ -1,4 +1,5 @@
 package com.lagradost.shiro.ui.tv
+import com.lagradost.shiro.utils.fv
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -9,7 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.NavHostFragment.findNavController
+import androidx.navigation.findNavController
 import androidx.preference.PreferenceManager
 import com.jaredrummler.cyanea.Cyanea
 import com.jaredrummler.cyanea.app.CyaneaAppCompatActivity
@@ -25,8 +26,6 @@ import com.lagradost.shiro.utils.AppUtils.init
 import com.lagradost.shiro.utils.AppUtils.settingsManager
 import com.lagradost.shiro.utils.InAppUpdater.runAutoUpdate
 import com.lagradost.shiro.utils.ShiroApi.Companion.initShiroApi
-import kotlinx.android.synthetic.main.activity_tv.*
-import kotlinx.android.synthetic.main.fragment_main_tv.*
 import java.lang.ref.WeakReference
 import kotlin.concurrent.thread
 
@@ -117,7 +116,7 @@ class TvActivity : CyaneaAppCompatActivity() {
         }
 
         setContentView(R.layout.activity_tv)
-        navController = findNavController(home_root_tv)
+        navController = fv<androidx.fragment.app.FragmentContainerView>(R.id.home_root_tv).findNavController()
         handleIntent(intent)
     }
 
@@ -127,9 +126,9 @@ class TvActivity : CyaneaAppCompatActivity() {
             try {
                 val nextFocused =
                     FocusFinder.getInstance()
-                        .findNextFocus(home_root_tv?.view as? ViewGroup?, currentFocus, View.FOCUS_UP)
+                        .findNextFocus(fv<androidx.fragment.app.FragmentContainerView>(R.id.home_root_tv) as? ViewGroup?, currentFocus, View.FOCUS_UP)
                 nextFocused?.requestFocus()
-                    ?: search_icon?.requestFocus()
+                    ?: fv<android.widget.ImageView>(R.id.search_icon)?.requestFocus()
                     ?: false
             } catch (e: Exception) {
                 return false

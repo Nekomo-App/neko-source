@@ -1,4 +1,5 @@
 package com.lagradost.shiro.ui.tv
+import com.lagradost.shiro.utils.fv
 
 /*
  * Copyright 2019 Google LLC
@@ -103,7 +104,6 @@ import com.lagradost.shiro.utils.ShiroApi.Companion.USER_AGENT
 import com.lagradost.shiro.utils.ShiroApi.Companion.fmod
 import com.lagradost.shiro.utils.ShiroApi.Companion.loadLinks
 import com.lagradost.shiro.utils.mvvm.normalSafeApiCall
-import kotlinx.android.synthetic.main.bottom_sheet.*
 import java.io.File
 import java.security.SecureRandom
 import java.util.concurrent.TimeUnit
@@ -278,7 +278,7 @@ class PlayerFragmentTv : VideoSupportFragment() {
                             val bottomSheetDialog = BottomSheetDialog(activity, R.style.AppBottomSheetDialogTheme)
                             bottomSheetDialog.setContentView(R.layout.bottom_sheet)
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                bottomSheetDialog.bottom_sheet_top_bar.backgroundTintList =
+                                bottomSheetDialog.fv<androidx.cardview.widget.CardView>(R.id.bottom_sheet_top_bar).backgroundTintList =
                                     ColorStateList.valueOf(Cyanea.instance.backgroundColorDark)
                             }
 
@@ -297,12 +297,12 @@ class PlayerFragmentTv : VideoSupportFragment() {
 
                                 bottomSheetDialog.dismiss()
                             }
-                            bottomSheetDialog.main_text?.text = "Source"
+                            bottomSheetDialog.fv<android.widget.TextView>(R.id.main_text)?.text = "Source"
                             // Full expansion for TV
                             bottomSheetDialog.setOnShowListener {
                                 normalSafeApiCall {
-                                    BottomSheetBehavior.from(bottomSheetDialog.bottom_sheet_root.parent as View).peekHeight =
-                                        bottomSheetDialog.bottom_sheet_root.height
+                                    BottomSheetBehavior.from(bottomSheetDialog.fv<android.widget.LinearLayout>(R.id.bottom_sheet_root).parent as View).peekHeight =
+                                        bottomSheetDialog.fv<android.widget.LinearLayout>(R.id.bottom_sheet_root).height
                                 }
                             }
                             bottomSheetDialog.show()
@@ -792,39 +792,13 @@ class PlayerFragmentTv : VideoSupportFragment() {
                         super.onVideoSizeChanged(videoSize)
                     }
 
-                    override fun onPlayerError(error: ExoPlaybackException) {
+                    override fun onPlayerError(error: PlaybackException) {
                         // Lets pray this doesn't spam Toasts :)
-                        when (error.type) {
-                            ExoPlaybackException.TYPE_SOURCE -> {
-                                if (currentUrl.url != "") {
-                                    Toast.makeText(
-                                        activity,
-                                        "Source error\n" + error.sourceException.message,
-                                        LENGTH_LONG
-                                    )
-                                        .show()
-                                }
-                            }
-                            ExoPlaybackException.TYPE_REMOTE -> {
-                                Toast.makeText(activity, "Remote error", LENGTH_LONG)
-                                    .show()
-                            }
-                            ExoPlaybackException.TYPE_RENDERER -> {
-                                Toast.makeText(
-                                    activity,
-                                    "Renderer error\n" + error.rendererException.message,
-                                    LENGTH_LONG
-                                )
-                                    .show()
-                            }
-                            ExoPlaybackException.TYPE_UNEXPECTED -> {
-                                Toast.makeText(
-                                    activity,
-                                    "Unexpected player error\n" + error.unexpectedException.message,
-                                    LENGTH_LONG
-                                ).show()
-                            }
-                        }
+                        Toast.makeText(
+                            activity,
+                            "Player error (${error.errorCodeName})\n" + (error.message ?: ""),
+                            LENGTH_LONG
+                        ).show()
                     }
                 })
 

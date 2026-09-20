@@ -55,7 +55,7 @@
                     android:layout_height="wrap_content"
                     android:textSize="30sp"
                     android:id="@+id/name_text"
-                    tools:text="Shiro"
+                    tools:text="Nekomo"
                     android:textStyle="bold"
                     android:text="Not logged in"
                     tools:visibility="visible"

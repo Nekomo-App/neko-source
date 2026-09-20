@@ -50,7 +50,7 @@ object InAppUpdater {
         @JsonProperty("changelog") val changelog: String?,
     )
 
-    private val mapper = JsonMapper.builder().addModule(KotlinModule())
+    private val mapper = JsonMapper.builder().addModule(KotlinModule.Builder().build())
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).build()
 
 
@@ -61,7 +61,7 @@ object InAppUpdater {
             val isBetaMode = settingsManager.getBoolean("beta_mode", false)
             val isTv = tvActivity != null
 
-            val url = "https://api.github.com/repos/Blatzar/shiro-app/releases"
+            val url = "https://api.github.com/repos/Nekomo-App/Nekomo/releases"
             val headers = mapOf("Accept" to "application/vnd.github.v3+json")
 
             val response = try {
@@ -131,11 +131,11 @@ object InAppUpdater {
 
         val request = DownloadManager.Request(Uri.parse(url))
             .setMimeType("application/vnd.android.package-archive")
-            .setTitle("Shiro update")
+            .setTitle("Nekomo update")
             .setDestinationInExternalFilesDir(
                 this,
                 Environment.DIRECTORY_DOWNLOADS,
-                "shiro.apk"
+                "nekomo.apk"
             )
             .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
             .setAllowedOverRoaming(true)

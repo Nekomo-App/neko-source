@@ -1,4 +1,5 @@
 package com.lagradost.shiro.ui
+import com.lagradost.shiro.utils.fv
 
 import DataStore.getKey
 import DataStore.removeKey
@@ -62,7 +63,6 @@ import com.lagradost.shiro.utils.VideoDownloadManager.KEY_RESUME_PACKAGES
 import com.lagradost.shiro.utils.VideoDownloadManager.currentDownloads
 import com.lagradost.shiro.utils.VideoDownloadManager.maxConcurrentDownloads
 import com.lagradost.shiro.utils.mvvm.observe
-import kotlinx.android.synthetic.main.activity_main.*
 import java.lang.ref.WeakReference
 import kotlin.concurrent.thread
 
@@ -272,7 +272,7 @@ class MainActivity : CyaneaAppCompatActivity() {
 
         // used for PlayerData to prevent crashes
         masterViewModel = masterViewModel ?: ViewModelProvider(this).get(MasterViewModel::class.java)
-        val settingsManager = PreferenceManager.getDefaultSharedPreferences(activity)
+        val settingsManager = PreferenceManager.getDefaultSharedPreferences(this)
         init()
         // Hack to make tinting work
         //if (Cyanea.instance.isLight) delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_YES
@@ -453,7 +453,7 @@ class MainActivity : CyaneaAppCompatActivity() {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         }
     }*/
-        mediaSession = MediaSessionCompat(activity!!, "fastani").apply {
+        mediaSession = MediaSessionCompat(activity!!, "nekomo").apply {
 
             setFlags(
                 MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS or
@@ -490,7 +490,7 @@ class MainActivity : CyaneaAppCompatActivity() {
             }
 
             // Fucks up anime info layout since that has its own layout
-            cast_mini_controller_holder?.isVisible = destination.id != R.id.navigation_results
+            fv<android.widget.LinearLayout>(R.id.cast_mini_controller_holder)?.isVisible = destination.id != R.id.navigation_results
 
             if (listOf(
                     R.id.navigation_home,
@@ -505,7 +505,7 @@ class MainActivity : CyaneaAppCompatActivity() {
                     navView.layoutParams = navView.layoutParams.apply {
                         val transition = ChangeBounds()
                         transition.duration = 100 // DURATION OF ANIMATION IN MS
-                        TransitionManager.beginDelayedTransition(container, transition)
+                        TransitionManager.beginDelayedTransition(fv<androidx.constraintlayout.widget.ConstraintLayout>(R.id.container), transition)
                         (this as ConstraintLayout.LayoutParams).setMargins(0, 0, 0, 0)
                     }
                 }
@@ -514,7 +514,7 @@ class MainActivity : CyaneaAppCompatActivity() {
                 navView.layoutParams = navView.layoutParams.apply {
                     val transition = ChangeBounds()
                     transition.duration = 100 // DURATION OF ANIMATION IN MS
-                    TransitionManager.beginDelayedTransition(container, transition)
+                    TransitionManager.beginDelayedTransition(fv<androidx.constraintlayout.widget.ConstraintLayout>(R.id.container), transition)
                     (this as ConstraintLayout.LayoutParams).setMargins(0, 0, 0, -navView.height)
                 }
             }

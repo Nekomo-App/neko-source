@@ -72,8 +72,6 @@ import com.google.android.gms.cast.framework.CastContext
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.images.WebImage
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.messaging.ktx.messaging
 import com.jaredrummler.cyanea.Cyanea
 import com.jaredrummler.cyanea.app.CyaneaAppCompatActivity
 import com.lagradost.shiro.AcraApplication.Companion.getAppContext
@@ -119,7 +117,7 @@ import kotlin.math.roundToInt
 object AppUtils {
     var settingsManager: SharedPreferences? = null
     var allApi: Vidstream = Vidstream()
-    val mapper: JsonMapper = JsonMapper.builder().addModule(KotlinModule())
+    val mapper: JsonMapper = JsonMapper.builder().addModule(KotlinModule.Builder().build())
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).build()
 
     fun FragmentActivity.init() {
@@ -323,12 +321,12 @@ object AppUtils {
             ).build()
         }.toTypedArray()
 
-        val castPlayer = CastPlayer(castContext)
-        castPlayer.loadItems(
+        castContext.sessionManager.currentCastSession?.remoteMediaClient?.queueLoad(
             mediaItems,
             0,
+            REPEAT_MODE_REPEAT_SINGLE,
             getKey(VIEW_POS_KEY, key, 0L)!!,
-            REPEAT_MODE_REPEAT_SINGLE
+            JSONObject()
         )
     }
 
@@ -676,45 +674,25 @@ object AppUtils {
         val isSubbed = isSubbedOld || subbedBookmark != null
 
         if (isSubbed /*&& !(isBookmarked ?: !isSubbed)*/) {
-            Firebase.messaging.unsubscribeFromTopic(data.slug)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        removeKey(SUBSCRIPTIONS_BOOKMARK_KEY, data.slug)
-                        removeKey(SUBSCRIPTIONS_KEY, data.slug)
-                    }
-                    var msg = "Unsubscribed to ${data.name}"//getString(R.string.msg_subscribed)
-                    if (!task.isSuccessful) {
-                        msg = "Unsubscribing failed :("//getString(R.string.msg_subscribe_failed)
-                    }
-                    thread {
-                        homeViewModel?.subscribed?.postValue(getSubbed())
-                    }
-                    //Log.d(TAG, msg)
-                    Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
-                }
+            removeKey(SUBSCRIPTIONS_BOOKMARK_KEY, data.slug)
+            removeKey(SUBSCRIPTIONS_KEY, data.slug)
+            thread {
+                homeViewModel?.subscribed?.postValue(getSubbed())
+            }
+            Toast.makeText(this, "Unsubscribed to ${data.name}", Toast.LENGTH_SHORT).show()
         } else /*if (!isSubbed && (isBookmarked ?: !isSubbed))*/ {
-            Firebase.messaging.subscribeToTopic(data.slug)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        setKey(
-                            SUBSCRIPTIONS_BOOKMARK_KEY, data.slug, BookmarkedTitle(
-                                data.name,
-                                data.image,
-                                data.slug,
-                                data.english
-                            )
-                        )
-                    }
-                    var msg = "Subscribed to ${data.name}"//getString(R.string.msg_subscribed)
-                    if (!task.isSuccessful) {
-                        msg = "Subscription failed :("//getString(R.string.msg_subscribe_failed)
-                    }
-                    thread {
-                        homeViewModel?.subscribed?.postValue(getSubbed())
-                    }
-                    //Log.d(TAG, msg)
-                    Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
-                }
+            setKey(
+                SUBSCRIPTIONS_BOOKMARK_KEY, data.slug, BookmarkedTitle(
+                    data.name,
+                    data.image,
+                    data.slug,
+                    data.english
+                )
+            )
+            thread {
+                homeViewModel?.subscribed?.postValue(getSubbed())
+            }
+            Toast.makeText(this, "Subscribed to ${data.name}", Toast.LENGTH_SHORT).show()
         }
     }
 
